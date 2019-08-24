@@ -60,8 +60,12 @@ class Game:
 					next_state.add(cell)
 		self.state = next_state
 
+	def run(self, generations):
+		for i in range(generations):
+			self.step()
+
 	def save_state(self, output_path):
-		np.savetxt(self.state)
+		np.savetxt(output_path, self.get_state())
 
 
 def main():
@@ -89,9 +93,7 @@ def main():
 	output_path = args.output_path
 
 	game = Game(xsize, ysize, input_path)
-
-	for i in range(generations):
-		game.step()
+	game.run(generations)
 	game.save_state(output_path)
 
 
