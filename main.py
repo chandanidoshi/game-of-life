@@ -30,15 +30,6 @@ class Game:
 				if grid[i][j] == 1:
 					self.state.add(cell)
 
-	def toggle_state(self, x, y):
-		if not self.is_valid_cell(x, y):
-			raise ValueError("Coordinates ({}, {}) are out of bounds".format(x, y))
-		cell = (x, y)
-		if cell in self.state:
-			self.state.remove(cell)
-		else:
-			self.state.add(cell)
-
 	def get_neighbors(self, x, y):
 		if not self.is_valid_cell(x, y):
 			raise ValueError("Coordinates ({}, {}) are out of bounds".format(x, y))
@@ -68,5 +59,20 @@ class Game:
 		self.state = next_state
 
 
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description="Conway's Game of Life")
+
+	parser.add_argument("-x", "--xsize", dest=xsize, required=False,
+		help="specify number of rows (default: 50)")
+	parser.add_argument("-y", "--ysize", dest=xsize, required=False, 
+		help="specify number of columns (default: 50)")
+	parser.add_argument("-i", "--input-path", dest=input_path, required=False, 
+		help="path of input file (default: generate random board")
+	parser.add_argument("-o", "--output-path", dest=output_path, required=False,
+		default="final_state.txt", help="path of output file")
+	parser.add_argument("-n", "--steps", dest=n_steps, required=False,
+		default=50, help="spcifiy number of generations")
+
+	args = parser.parse_args()
 
 
