@@ -1,10 +1,36 @@
+"""
+This is a simulation of Conway's Game of Life 
+(https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
+In the game, a cell evolves according to the following rules:
+	1. Any live cell with fewer than two live neighbours dies, as if by underpopulation
+	2. Any live cell with two or three live neighbours lives on to the next generation
+	3. Any live cell with more than three live neighbours dies, as if by overpopulation
+	4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction
+"""
+
 import argparse
 import numpy as np
 
 
-class Game:
-	def __init__(self, xsize=50, ysize=50, file_path=None):
+class GameOfLife:
+	"""
+	This class represents a game of life of size m x n. 
+	The state at each timestep is represented by a set of live cells, and at each step,
+	the state is updated based on the four rules of the game.
+
+	Attributes:
+		xsize: number of rows in game grid
+		ysize: number of columns in game grid
+		state: set of coordinates of live cells in current state
+	"""
+
+
+	def __init__(self, xsize, ysize, file_path=None):
 		self.xsize, self.ysize = xsize, ysize
+		
+		# Initialize state
+		# Loads from initial state file if provided
+		# else initiliazes a random grid
 		self.state = set()
 		if file_path:
 			grid = self.init_from_file(file_path)
@@ -92,12 +118,10 @@ def main():
 		input_path = args.input_path
 	output_path = args.output_path
 
-	game = Game(xsize, ysize, input_path)
+	game = GameOfLife(xsize, ysize, input_path)
 	game.run(generations)
 	game.save_state(output_path)
 
 
 if __name__ == '__main__':
 	main()
-
-
