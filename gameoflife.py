@@ -34,7 +34,7 @@ class GameOfLife(object):
             grid = self.init_from_file(file_path)
         else:
             grid = self.init_random_board()
-        self.initiliaze_state(grid)
+        self.initialize_state(grid)
 
     def init_random_board(self):
         """
