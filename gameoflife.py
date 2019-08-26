@@ -124,7 +124,7 @@ class GameOfLife(object):
         Save state of game to file
         :param output_path: path of output file
         """
-        np.savetxt(output_path, self.get_state())
+        np.savetxt(output_path, self.get_state(), fmt='%d')
 
 
 def main():
