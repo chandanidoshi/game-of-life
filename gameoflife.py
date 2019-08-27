@@ -15,7 +15,7 @@ import numpy as np
 class GameOfLife(object):
     """
     A class used to represent Conway's Game of Life.
-    The state at each timestep is represented by a set of live cells, and at each step,
+    The state at each time step is represented by a set of live cells, and at each step,
     the state is updated based on the four rules of the game.
 
     Attributes:
@@ -24,8 +24,9 @@ class GameOfLife(object):
         state: set of coordinates of live cells in current state
     """
 
-    def __init__(self, xsize, ysize, file_path=None):
+    def __init__(self, xsize=50, ysize=50, alive=.5, file_path=None):
         self.xsize, self.ysize = xsize, ysize
+        self.include_focal = False
         # Initialize state
         # Loads from file, if provided,
         # else initializes a random grid
@@ -33,15 +34,15 @@ class GameOfLife(object):
         if file_path:
             grid = self.init_from_file(file_path)
         else:
-            grid = self.init_random_board()
+            grid = self.init_random_board(alive)
         self.initialize_state(grid)
 
-    def init_random_board(self):
+    def init_random_board(self, alive):
         """
         Initialize random grid
         :return: state matrix
         """
-        grid = np.random.binomial(1, .5, size=(self.xsize, self.ysize))
+        grid = np.random.binomial(1, alive, size=(self.xsize, self.ysize))
         return grid
 
     def init_from_file(self, file_path):
@@ -66,6 +67,12 @@ class GameOfLife(object):
                 if grid[i, j] == 1:
                     self.state.add(cell)
 
+    def set_include_focal(self):
+        """
+        Include the focal cell as a neighbor of itself
+        """
+        self.include_focal = True
+
     def get_state(self):
         """
         Convert sparse representation into state matrix
@@ -86,7 +93,7 @@ class GameOfLife(object):
         neighbors = []
         for i in range(max(0, x - 1), min(x + 2, self.xsize)):
             for j in range(max(0, y - 1), min(y + 2, self.ysize)):
-                if i == x and j == y:
+                if not self.include_focal and i == x and j == y:
                     continue
                 neighbors.append((i, j))
         return neighbors
@@ -111,13 +118,17 @@ class GameOfLife(object):
                     next_state.add(cell)
         self.state = next_state
 
-    def run(self, generations):
+    def run(self, generations, save_generation, output_path):
         """
         Run game for specified number of generations
         :param generations: number of iterations to update state
+        :param save_generation: number of generation to write to file
+        :param output_path: path of output file
         """
         for i in range(generations):
             self.step()
+            if i == save_generation:
+                self.save_state(output_path)
 
     def save_state(self, output_path):
         """
@@ -130,30 +141,41 @@ class GameOfLife(object):
 def main():
     parser = argparse.ArgumentParser(description="Conway's Game of Life")
 
-    parser.add_argument("-x", "--xsize", dest='xsize', required=False,
+    parser.add_argument("-x", "--xsize", dest='xsize', type=int, required=False,
                         default=50, help="specify number of rows (default: 50)")
-    parser.add_argument("-y", "--ysize", dest='ysize', required=False,
+    parser.add_argument("-y", "--ysize", dest='ysize', type=int, required=False,
                         default=50, help="specify number of columns (default: 50)")
     parser.add_argument("-i", "--input-path", dest='input_path', required=False,
                         help="path of input file (default: generate random board)")
     parser.add_argument("-o", "--output-path", dest='output_path', required=False,
                         default="final_state.txt", help="path of output file")
-    parser.add_argument("-n", "--generations", dest='generations', required=False,
+    parser.add_argument("-n", "--total-generations", dest='total_generations', type=int, required=False,
                         default=50, help="specify number of generations (default: 50)")
+    parser.add_argument("-g", "--save-generation", dest='save_generation', type=int, required=False,
+                        help="specify generation to write to file (default: same as number of generations)")
+    parser.add_argument("-f", "--include_focal", dest="include_focal", required=False, action="store_true",
+                        default=False, help="if true, includes focal cell as a neighbor")
+    parser.add_argument("-p", "--alive", dest="alive", type=float, required=False,
+                        default=.5, help="probability that a cell in the initial frame is alive")
 
     args = parser.parse_args()
 
     xsize = int(args.xsize)
     ysize = int(args.ysize)
-    generations = int(args.generations)
+    total_generations = int(args.total_generations)
     input_path = None
     if args.input_path:
         input_path = args.input_path
     output_path = args.output_path
+    alive = float(args.alive)
+    save_generation = total_generations
+    if args.save_generation:
+        save_generation = args.save_generation
 
-    game = GameOfLife(xsize, ysize, input_path)
-    game.run(generations)
-    game.save_state(output_path)
+    game = GameOfLife(xsize, ysize, alive, input_path)
+    if args.include_focal:
+        game.set_include_focal()
+    game.run(total_generations, save_generation, output_path)
 
 
 if __name__ == '__main__':
