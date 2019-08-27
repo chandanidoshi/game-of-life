@@ -127,7 +127,7 @@ class GameOfLife(object):
         """
         for i in range(generations):
             self.step()
-            if i == save_generation:
+            if i == save_generation - 1:
                 self.save_state(output_path)
 
     def save_state(self, output_path):
@@ -160,17 +160,17 @@ def main():
 
     args = parser.parse_args()
 
-    xsize = int(args.xsize)
-    ysize = int(args.ysize)
-    total_generations = int(args.total_generations)
+    xsize = args.xsize
+    ysize = args.ysize
+    total_generations = args.total_generations
     input_path = None
     if args.input_path:
         input_path = args.input_path
     output_path = args.output_path
-    alive = float(args.alive)
+    alive = args.alive
     save_generation = total_generations
     if args.save_generation:
-        save_generation = args.save_generation
+        save_generation = min(save_generation, args.save_generation)
 
     game = GameOfLife(xsize, ysize, alive, input_path)
     if args.include_focal:
