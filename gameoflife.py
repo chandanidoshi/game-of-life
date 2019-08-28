@@ -24,18 +24,31 @@ class GameOfLife(object):
         state: set of coordinates of live cells in current state
     """
 
-    def __init__(self, xsize=50, ysize=50, alive=.5, file_path=None):
+    def __init__(self, xsize=50, ysize=50, alive=.5, initial_state=None, file_path=None):
         self.xsize, self.ysize = xsize, ysize
         self.include_focal = False
         # Initialize state
         # Loads from file, if provided,
         # else initializes a random grid
         self.state = set()
-        if file_path:
-            grid = self.init_from_file(file_path)
+        if initial_state:
+            grid = self.init_given_board(initial_state)
         else:
-            grid = self.init_random_board(alive)
+            if file_path:
+                grid = self.init_from_file(file_path)
+            else:
+                grid = self.init_random_board(alive)
         self.initialize_state(grid)
+
+    def init_given_board(self, initial_state):
+        """
+        Initialize with given state matrix
+        :param grid: initial state
+        :return: state matrix
+        """
+        grid = np.array(initial_state)
+        self.xsize, self.ysize = grid.shape
+        return grid
 
     def init_random_board(self, alive):
         """
@@ -81,7 +94,7 @@ class GameOfLife(object):
         grid = np.zeros((self.xsize, self.ysize))
         for x, y in self.state:
             grid[x, y] = 1
-        return grid
+        return grid.astype(int)
 
     def get_neighbors(self, x, y):
         """
@@ -172,7 +185,7 @@ def main():
     if args.save_generation:
         save_generation = min(save_generation, args.save_generation)
 
-    game = GameOfLife(xsize, ysize, alive, input_path)
+    game = GameOfLife(xsize, ysize, alive, file_path=input_path)
     if args.include_focal:
         game.set_include_focal()
     game.run(total_generations, save_generation, output_path)
