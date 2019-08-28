@@ -7,10 +7,14 @@ Get neighbors:
 - neighbors when focal cell is included
 
 Step:
+- all cells are dead
 - Rule 1: Any live cell with fewer than two live neighbours dies
 - Rule 2: Any live cell with two or three live neighbours lives on
 - Rule 3: Any live cell with more than three live neighbours dies
 - Rule 4: Any dead cell with exactly three live neighbours becomes a live cell
+
+Run:
+- Run for more than 1 generation
 """
 
 import unittest
@@ -52,6 +56,19 @@ class TestGameOfLife(unittest.TestCase):
         self.assertIn((1, 1), neighbors)
         self.assertIn((2, 0), neighbors)
         self.assertIn((2, 1), neighbors)
+
+    def test_step_all_dead(self):
+        initial_state = [[0, 0, 0],
+                         [0, 0, 0],
+                         [0, 0, 0]]
+        next_state = np.array([[0, 0, 0],
+                               [0, 0, 0],
+                               [0, 0, 0]])
+
+        game = GameOfLife(initial_state=initial_state)
+        game.step()
+        game_state = game.get_state()
+        self.assertTrue(np.array_equal(game_state, next_state))
 
     def test_step_rule_1(self):
         initial_state = [[0, 1, 0],
@@ -104,6 +121,19 @@ class TestGameOfLife(unittest.TestCase):
         game.step()
         game_state = game.get_state()
         self.assertTrue(np.array_equal(game_state, next_state))
+
+    def test_run(self):
+        initial_state = [[1, 1, 1],
+                         [1, 1, 1],
+                         [1, 1, 1]]
+        final_state = np.array([[0, 0, 0],
+                                [0, 0, 0],
+                                [0, 0, 0]])
+
+        game = GameOfLife(initial_state=initial_state)
+        game.run(generations=2)
+        game_state = game.get_state()
+        self.assertTrue(np.array_equal(game_state, final_state))
 
 
 if __name__ == '__main__':

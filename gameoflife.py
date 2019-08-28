@@ -131,16 +131,17 @@ class GameOfLife(object):
                     next_state.add(cell)
         self.state = next_state
 
-    def run(self, generations, save_generation, output_path):
+    def run(self, generations, save_state=False, save_generation=0, output_path=None):
         """
         Run game for specified number of generations
+        :param save_state: if true, save state to file
         :param generations: number of iterations to update state
         :param save_generation: number of generation to write to file
         :param output_path: path of output file
         """
         for i in range(generations):
             self.step()
-            if i == save_generation - 1:
+            if save_state and i == save_generation - 1:
                 self.save_state(output_path)
 
     def save_state(self, output_path):
@@ -188,7 +189,7 @@ def main():
     game = GameOfLife(xsize, ysize, alive, file_path=input_path)
     if args.include_focal:
         game.set_include_focal()
-    game.run(total_generations, save_generation, output_path)
+    game.run(total_generations, True, save_generation, output_path)
 
 
 if __name__ == '__main__':
