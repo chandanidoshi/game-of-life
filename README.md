@@ -11,7 +11,7 @@ Run the game using the following command:
 ```
 -x --xsize        number of rows
 -y --ysize        number of columns
--i --input-path   final containing initial state
+-i --input-path   file containing initial state
 -o --output-path  path to output file
 -n --generatons   number of generations
 ```
